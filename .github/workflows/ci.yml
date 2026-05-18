@@ -17,10 +17,12 @@ on:
       io_uring_supported:
         default: false
         type: boolean
+  push:
+  workflow_dispatch:
 jobs:
   Test:
     name: Run tests
-    runs-on: ${{ inputs.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,3 +42,10 @@ jobs:
           # io_uring testing requires more locked memory for kernel ring buffers than the default 8MB limit
           sudo prlimit --pid $$ --memlock=16777216:16777216
           mvn -s .github/maven-ci-settings.xml -q clean verify -B ${{ inputs.profile }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
