@@ -17,6 +17,8 @@ on:
       io_uring_supported:
         default: false
         type: boolean
+  push:
+  workflow_dispatch:
 jobs:
   Test:
     name: Run tests
