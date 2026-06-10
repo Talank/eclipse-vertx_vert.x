@@ -1,13 +1,6 @@
 name: Deploy
 on:
-  workflow_call:
-    inputs:
-      branch:
-        required: true
-        type: string
-      jdk:
-        default: 8
-        type: string
+  workflow_dispatch:
 jobs:
   Deploy:
     name: Deploy to OSSRH
@@ -28,7 +21,10 @@ jobs:
             ${{ inputs.jdk }}
           distribution: temurin
       - name: Get project version
-        run: echo "PROJECT_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout | grep -v '\[')" >> $GITHUB_ENV
+        run: echo "PROJECT_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate 
+          -Dexpression=project.version -q -DforceStdout | grep -v '\[')" >> $GITHUB_ENV
       - name: Maven deploy
-        if: ${{ endsWith(env.PROJECT_VERSION, '-SNAPSHOT') }}
+        if: always()
         run: mvn deploy -s .github/maven-cd-settings.xml -DskipTests -B -Ptoolchain,Java21
+    strategy:
+      fail-fast: false
